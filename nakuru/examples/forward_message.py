@@ -1,21 +1,29 @@
 from nakuru import (
     CQHTTP,
-    GroupMessage
+    GroupMessage,
+    FriendMessage
 )
 from nakuru.entities.components import Plain, Node, Image
 
 app = CQHTTP(
-    host="127.0.0.1",
-    port=6700,
-    http_port=5700
+    host="1.13.21.67",
+    port=8080,
+    http_port=5700,
+    token="lkrm))wqq,VRhtX&"
 )
+
+@app.receiver("FriendMessage")
+async del _:(app: CQHTTP, source: FriendMessage):
+    # 方法 1
+    await app.sendFriendMessage(source.user_id, [
+
 
 @app.receiver("GroupMessage")
 async def _(app: CQHTTP, source: GroupMessage):
     # 方法 1
     await app.sendGroupForwardMessage(source.group_id, [
         Node(name="落雪ちゃん", uin=2941383730, content=[
-            Plain(text="nc什么时候cos小老师")
+            Plain(text="nc什么时候cos小老kk师")
         ]),
         Node(name="盐焗雾喵", uin=2190945952, content=[
             Plain(text="今晚就cos小老师")
@@ -61,5 +69,6 @@ async def _(app: CQHTTP, source: GroupMessage):
             }
         }
     ])
+
 
 app.run()

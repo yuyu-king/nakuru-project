@@ -22,6 +22,7 @@ from .misc import argument_signature, raiser, TRACEBACKED
 from .protocol import CQHTTP_Protocol
 from .logger import logger
 
+# q:why the CQHTTP class inherits CQHTTP_Protocol?
 class CQHTTP(CQHTTP_Protocol):
     event: Dict[
         str, List[Callable[[Any], Awaitable]]
@@ -109,6 +110,7 @@ class CQHTTP(CQHTTP_Protocol):
     @property
     def registeredEventNames(self):
         return [self.getEventCurrentName(i) for i in self.event.keys()]
+
 
     async def executor(self,
                        executor_protocol: ExecutorProtocol,
