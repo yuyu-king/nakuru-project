@@ -12,11 +12,6 @@ app = CQHTTP(
     token="lkrm))wqq,VRhtX&"
 )
 
-@app.receiver("FriendMessage")
-async del _:(app: CQHTTP, source: FriendMessage):
-    # 方法 1
-    await app.sendFriendMessage(source.user_id, [
-
 
 @app.receiver("GroupMessage")
 async def _(app: CQHTTP, source: GroupMessage):

@@ -19,11 +19,11 @@ from .event.models import (
 )
 from .event.enums import ExternalEvents
 from .misc import argument_signature, raiser, TRACEBACKED
-from .protocol import CQHTTP_Protocol
+from .protocol import CqhttpProtocol
 from .logger import logger
 
-# q:why the CQHTTP class inherits CQHTTP_Protocol?
-class CQHTTP(CQHTTP_Protocol):
+
+class CQHTTP(CqhttpProtocol):
     event: Dict[
         str, List[Callable[[Any], Awaitable]]
     ] = {}
@@ -88,7 +88,7 @@ class CQHTTP(CQHTTP_Protocol):
                             logger.error("Protocol: data parse error: " + str(received_data))
                             continue
                         await self.queue.put(InternalEvent(
-                            name=self.getEventCurrentName(type(received_data)),
+                            name=self.get_event_current_name(type(received_data)),
                             body=received_data
                         ))
 
@@ -109,8 +109,7 @@ class CQHTTP(CQHTTP_Protocol):
 
     @property
     def registeredEventNames(self):
-        return [self.getEventCurrentName(i) for i in self.event.keys()]
-
+        return [self.get_event_current_name(i) for i in self.event.keys()]
 
     async def executor(self,
                        executor_protocol: ExecutorProtocol,
@@ -191,7 +190,7 @@ class CQHTTP(CQHTTP_Protocol):
                 stack.enter_context(normal_middleware)
 
             return await self.run_func(executor_protocol.callable, **CallParams, **extra_parameter)
-    
+
     async def _run(self):
         loop = asyncio.get_event_loop()
         self.queue = asyncio.Queue(loop=loop) if sys.version_info.minor < 10 else asyncio.Queue()
@@ -199,7 +198,7 @@ class CQHTTP(CQHTTP_Protocol):
         loop.create_task(self.event_runner())
 
         await self.queue.put(InternalEvent(
-            name=self.getEventCurrentName("AppInitEvent"),
+            name=self.get_event_current_name("AppInitEvent"),
             body={}
         ))
         try:
@@ -219,7 +218,7 @@ class CQHTTP(CQHTTP_Protocol):
 
             for end_callable in self.lifecycle['end']:
                 await self.run_func(end_callable, self)
-    
+
     def run(self):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._run())
@@ -232,7 +231,7 @@ class CQHTTP(CQHTTP_Protocol):
         def receiver_warpper(func: Callable):
             if not inspect.iscoroutinefunction(func):
                 raise TypeError("event body must be a coroutine function.")
-            
+
             self.event.setdefault(event_name, [])
             self.event[event_name].append(ExecutorProtocol(
                 callable=func,
@@ -243,7 +242,7 @@ class CQHTTP(CQHTTP_Protocol):
 
         return receiver_warpper
 
-    def getEventCurrentName(self, event_value):
+    def get_event_current_name(self, event_value):
         class_list = (
             GroupMessage,
             FriendMessage,
@@ -257,8 +256,8 @@ class CQHTTP(CQHTTP_Protocol):
         elif event_value in class_list:  # message
             return event_value.__name__
         elif isinstance(event_value, (  # enum
-            MessageItemType,
-            ExternalEvents
+                MessageItemType,
+                ExternalEvents
         )):
             return event_value.name
         else:
@@ -268,27 +267,27 @@ class CQHTTP(CQHTTP_Protocol):
         return {
             CQHTTP: lambda k: self,
             FriendMessage: lambda k: k.body \
-                if self.getEventCurrentName(k.body) == "FriendMessage" else \
+                if self.get_event_current_name(k.body) == "FriendMessage" else \
                 raiser(ValueError("you cannot setting a unbind argument.")),
             GroupMessage: lambda k: k.body \
-                if self.getEventCurrentName(k.body) == "GroupMessage" else \
+                if self.get_event_current_name(k.body) == "GroupMessage" else \
                 raiser(ValueError("you cannot setting a unbind argument.")),
             GuildMessage: lambda k: k.body \
-                if self.getEventCurrentName(k.body) == "GuildMessage" else \
+                if self.get_event_current_name(k.body) == "GuildMessage" else \
                 raiser(ValueError("you cannot setting a unbind argument.")),
             Friend: lambda k: k.body.sender \
-                if self.getEventCurrentName(k.body) == "FriendMessage" else \
+                if self.get_event_current_name(k.body) == "FriendMessage" else \
                 raiser(ValueError("Friend is not enable in this type of event.")),
             Member: lambda k: k.body.sender \
-                if self.getEventCurrentName(k.body) == "GroupMessage" else \
+                if self.get_event_current_name(k.body) == "GroupMessage" else \
                 raiser(ValueError("Group is not enable in this type of event.")),
             GuildMember: lambda k: k.body.sender \
-                if self.getEventCurrentName(k.body) == "GuildMessage" else \
+                if self.get_event_current_name(k.body) == "GuildMessage" else \
                 raiser(ValueError("Group is not enable in this type of event.")),
             "Sender": lambda k: k.body.sender \
-                if self.getEventCurrentName(k.body) in MessageTypes else \
+                if self.get_event_current_name(k.body) in MessageTypes else \
                 raiser(ValueError("Sender is not enable in this type of event.")),
-            "Type": lambda k: self.getEventCurrentName(k.body),
+            "Type": lambda k: self.get_event_current_name(k.body),
             **self.gen_event_anno()
         }
 
@@ -297,7 +296,7 @@ class CQHTTP(CQHTTP_Protocol):
             if name != event_context.name:
                 raise ValueError("cannot look up a non-listened event.")
             return event_context.body
-        
+
         return {
             event_class.value for event_name, event_class in ExternalEvents.__members__.items()
         }
@@ -307,7 +306,7 @@ class CQHTTP(CQHTTP_Protocol):
             if name != event_context.name:
                 raise ValueError("cannot look up a non-listened event.")
             return event_context.body
-        
+
         return {
             event_class.value: partial(warpper, copy.copy(event_name)) \
             for event_name, event_class in ExternalEvents.__members__.items()

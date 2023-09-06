@@ -2,10 +2,12 @@ from pydantic import BaseModel
 from typing import Optional, List
 import typing as T
 
+
 class BotGuild(BaseModel):
     nickname: str
     tiny_id: int
     avatar_url: str
+
 
 class Guild(BaseModel):
     guild_id: int
@@ -20,11 +22,13 @@ class Guild(BaseModel):
     member_count: Optional[int]
     owner_id: Optional[int]
 
+
 class SlowMode(BaseModel):
     slow_mode_key: int
     slow_mode_text: str
     speak_frequency: int
     slow_mode_circle: int
+
 
 class Channel(BaseModel):
     owner_guild_id: int
@@ -39,6 +43,7 @@ class Channel(BaseModel):
     current_slow_mode: int
     slow_modes: List[SlowMode]
 
+
 class GuildMember(BaseModel):
     tiny_id: Optional[int]
     user_id: Optional[int]
@@ -48,10 +53,12 @@ class GuildMember(BaseModel):
     # 仅论坛子频道
     icon_url: Optional[str]
 
+
 class GuildMembers(BaseModel):
     members: List[GuildMember]
     bots: List[GuildMember]
     admins: List[GuildMember]
+
 
 class Reaction(BaseModel):
     emoji_id: str
@@ -60,6 +67,7 @@ class Reaction(BaseModel):
     emoji_name: str
     count: int
     clicked: bool
+
 
 class Role(BaseModel):
     role_id: int
@@ -71,9 +79,11 @@ class Role(BaseModel):
     owned: Optional[int]
     disabled: Optional[bool]
 
+
 """
 论坛子频道相关
 """
+
 
 class TopicChannelFile(BaseModel):
     file_id: str
@@ -82,9 +92,11 @@ class TopicChannelFile(BaseModel):
     width: int
     height: int
 
+
 class TopicChannelFeedResource(BaseModel):
     images: List[TopicChannelFile]
     videos: List[TopicChannelFile]
+
 
 class TopicChannelFeed(BaseModel):
     id: int

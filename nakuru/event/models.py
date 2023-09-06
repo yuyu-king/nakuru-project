@@ -7,8 +7,10 @@ from ..misc import CQParser
 
 parser = CQParser()
 
+
 class AppInitEvent(BaseModel):
     pass
+
 
 class MessageItemType(Enum):
     FriendMessage = "FriendMessage"
@@ -16,6 +18,7 @@ class MessageItemType(Enum):
     GuildMessage = "GuildMessage"
     BotMessage = "BotMessage"
     Message = "Message"
+
 
 class FriendMessage(BaseModel):
     type: MessageItemType = "FriendMessage"
@@ -32,6 +35,7 @@ class FriendMessage(BaseModel):
     def __init__(self, message: str, **_):
         message = parser.parseChain(message)
         super().__init__(message=message, **_)
+
 
 class GroupMessage(BaseModel):
     type: MessageItemType = "GroupMessage"
@@ -51,6 +55,7 @@ class GroupMessage(BaseModel):
         message = parser.parseChain(message)
         super().__init__(message=message, **_)
 
+
 class GuildMessage(BaseModel):
     type: MessageItemType = "GuildMessage"
     self_id: int
@@ -69,9 +74,11 @@ class GuildMessage(BaseModel):
         message = parser.parseChain(message)
         super().__init__(message=message, raw_message=raw_message, **_)
 
+
 class BotMessage(BaseModel):
     type: MessageItemType = "BotMessage"
     message_id: T.Union[int, str]
+
 
 class Message(BaseModel):  # getMessage
     type: MessageItemType = "Message"
@@ -86,15 +93,18 @@ class Message(BaseModel):  # getMessage
         message = parser.parseChain(message)
         super().__init__(message=message, **_)
 
+
 MessageTypes = {
     "private": FriendMessage,
     "group": GroupMessage,
     "guild": GuildMessage
 }
 
+
 class ForwardMessageSender(BaseModel):
     nickname: str
     user_id: int
+
 
 class ForwardMessageNode(BaseModel):
     content: T.Union[str, list]
@@ -107,8 +117,10 @@ class ForwardMessageNode(BaseModel):
         content = parser.parseChain(content)
         super().__init__(content=content, raw_content=raw_content, **_)
 
+
 class ForwardMessages(BaseModel):
     messages: T.List[ForwardMessageNode]
+
 
 class NoticeItemType(Enum):
     GroupFileUpload = "GroupFileUpload"
@@ -131,6 +143,7 @@ class NoticeItemType(Enum):
     ChannelDestroyed = "ChannelDestroyed"
     GuildChannelRecall = "GuildChannelRecall"
 
+
 class GroupFileUpload(BaseModel):
     type: NoticeItemType = "GroupFileUpload"
     time: int
@@ -139,6 +152,7 @@ class GroupFileUpload(BaseModel):
     user_id: int
     file: File
 
+
 class GroupAdminChange(BaseModel):
     type: NoticeItemType = "GroupAdminChange"
     time: int
@@ -146,6 +160,7 @@ class GroupAdminChange(BaseModel):
     sub_type: str
     group_id: int
     user_id: int
+
 
 class GroupMemberDecrease(BaseModel):
     type: NoticeItemType = "GroupMemberDecrease"

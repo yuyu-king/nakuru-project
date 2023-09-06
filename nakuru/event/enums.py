@@ -1,6 +1,7 @@
 from .models import *
 from enum import Enum
 
+
 class ExternalEvents(Enum):
     AppInitEvent = AppInitEvent
 
@@ -26,6 +27,7 @@ class ExternalEvents(Enum):
 
     FriendRequest = FriendRequest
     GroupRequest = GroupRequest
+
 
 class ExternalEventTypes(Enum):
     AppInitEvent = "AppInitEvent"
